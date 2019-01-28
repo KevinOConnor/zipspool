@@ -1,0 +1,8 @@
+This directory contains STL files generated from the main
+zipspool.scad OpenSCAD file.
+
+The holder.stl, spindle.stl, and clip.stl come from the main file.
+
+The holder.stl is generated from the main file with holder_height=180.
+The spindle-wide.stl and clip-wide.stl are generated with
+spindle_spool_length=101.
