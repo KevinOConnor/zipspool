@@ -1,4 +1,4 @@
-In order to print this spool holder you will need:
+In order to use this spool holder you will need:
 
 1. A ziplock bag. Regular 2Kg spools will fit in "2 gallon bags" that
    can be widely found in grocery stores. However, standard ziplock
