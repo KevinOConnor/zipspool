@@ -22,7 +22,7 @@ spindle_key_diameter = 3;
 spindle_key_offset = 5;
 spindle_key_angles = [90, 210, 330];
 spindle_spool_length = 71;
-clip_tube_diameter = 4;
+ptfe_tube_diameter = 4;
 clip_height = 10;
 clip_depth = 10;
 slack = 1;
@@ -201,53 +201,55 @@ module filament_clip() {
         }
     }
     clip_z = 10;
+    tube_z = 24;
     clip_inner_height = 5;
-    outer_diameter = clip_tube_diameter+5;
+    outer_diameter = ptfe_tube_diameter+5;
     holder_angle = 30;
     holder_offset = 5;
     guide_lift = -1;
     module filament_holder() {
-        module base(y) {
+        module base(y, z) {
             adj_y = y + clip_inner_height/2;
             translate([-outer_diameter, outer_diameter/2 - adj_y, 0])
-                cube([2*outer_diameter, y, clip_z]);
+                cube([2*outer_diameter, y, z]);
         }
         module outer_cylinder() {
             hull() {
                 rotate(-holder_angle, v=[1, 0, 0])
-                    base(1);
+                    base(1, clip_z);
                 translate([0, guide_lift, 0])
-                    cylinder(h=clip_z, d=outer_diameter);
+                    cylinder(h=tube_z, d=outer_diameter);
             }
         }
         translate([0, holder_offset, 0]) {
             intersection() {
-                base(99);
+                base(99, 99);
                 rotate(holder_angle, v=[1, 0, 0])
                     outer_cylinder();
             }
         }
     }
     module filament_tube() {
-        // Tip
-        hull() {
-            translate([0, 0, clip_z - .5 - CUT])
-                cylinder(h=.5 + 2*CUT, d=clip_tube_diameter-1);
-            translate([0, -1, clip_z - .5 - CUT])
-                cylinder(h=.5 + 2*CUT, d=clip_tube_diameter-1);
+        module tube(d, z1, z2) {
+            translate([0, 0, z1])
+                cylinder(h=(z2-z1), d=d);
         }
+        filament_only_dia = ptfe_tube_diameter - 1;
+        tube_guide_dia = ptfe_tube_diameter + slack / 4;
+        tube_extra_dia = ptfe_tube_diameter + slack;
+        separator_z1 = tube_z / 2 + 1 - .5;
+        separator_z2 = separator_z1 + 1;
         // Main channel
-        translate([0, 0, -99])
-            cylinder(h=clip_z - .5 + 99, d=clip_tube_diameter + slack);
-        // Extra diameter at tip
-        translate([0, 0, clip_z - .5 - 2])
-            cylinder(h=2, d=clip_tube_diameter + 2*slack);
-        // Extra diameter at middle
-        translate([0, 0, clip_z - .5 - 5])
-            cylinder(h=2, d=clip_tube_diameter + 2*slack);
-        // Extra diameter at entrance
-        translate([0, 0, clip_z - .5 - 6 - 99])
-            cylinder(h=99, d=clip_tube_diameter + 2*slack);
+        tube(filament_only_dia, 0, tube_z);
+        tube(tube_guide_dia, -99, separator_z1);
+        tube(tube_guide_dia, separator_z2, 99);
+        // Add ribs to channel
+        tube(tube_extra_dia, -99, separator_z1 - 8);
+        tube(tube_extra_dia, separator_z1 - 7, separator_z1 - 4);
+        tube(tube_extra_dia, separator_z1 - 3, separator_z1);
+        tube(tube_extra_dia, separator_z2, separator_z2 + 3);
+        tube(tube_extra_dia, separator_z2 + 4, separator_z2 + 7);
+        tube(tube_extra_dia, separator_z2 + 8, 99);
     }
     module filament_cutout() {
         translate([0, holder_offset, 0])
