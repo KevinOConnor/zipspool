@@ -1,6 +1,6 @@
 // ZipSpool - Filament spool holder for printing from a sealed bag
 //
-// Copyright (C) 2019  Kevin O'Connor <kevin@koconnor.net>
+// Copyright (C) 2019-2020  Kevin O'Connor <kevin@koconnor.net>
 //
 // This file may be distributed under the terms of the GNU GPLv3 license.
 
@@ -91,17 +91,19 @@ module holder() {
     }
     // Add clip holders to the base
     angle = atan(backing_center_y / ((holder_width-spindle_diameter)/2));
-    module clip(dir) {
+    module clip(dir, offset) {
         translate([-dir * holder_width/2, 0, 0])
             rotate(dir * angle, [0, 0, 1])
-               translate([dir * holder_clip_offset, holder_clip_width,
+               translate([dir * offset, holder_clip_width,
                           holder_arm_depth/2])
                   cube(size=[holder_clip_height,
                              2*holder_clip_width,
                              holder_arm_depth], center=true);
     }
-    clip(1);
-    clip(-1);
+    for (clip_num=[1, 2, 3, 4]) {
+        clip(1, clip_num * holder_clip_offset);
+        clip(-1, clip_num * holder_clip_offset);
+    }
 }
 
 //
