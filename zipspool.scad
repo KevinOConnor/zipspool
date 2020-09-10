@@ -27,6 +27,7 @@ clip_height = 10;
 clip_depth = 10;
 slack = 1;
 CUT = 0.01;
+$fs = 0.5;
 
 //
 // Holder
@@ -35,7 +36,7 @@ CUT = 0.01;
 module key(angle, diameter) {
     rotate(angle, [0, 0, 1])
         translate([diameter/2, 0, 0])
-            sphere(d=spindle_key_diameter, $fs=.5);
+            sphere(d=spindle_key_diameter);
 }
 
 module holder() {
@@ -45,7 +46,7 @@ module holder() {
     module arms() {
         module base_cylinder(pos) {
             translate(pos)
-                cylinder(h=holder_arm_depth, d=holder_arm_height, $fs=.5);
+                cylinder(h=holder_arm_depth, d=holder_arm_height);
         }
         bot1 = [-holder_width/2, 0];
         bot2 = [holder_width/2, 0];
@@ -123,7 +124,7 @@ module spindle() {
             intersection() {
                 rotate_extrude() {
                     translate([spindle_diameter/2, 0, 0])
-                        circle(d=spindle_key_diameter, $fs=.5);
+                        circle(d=spindle_key_diameter);
                 }
                 len = (spindle_diameter + spindle_key_diameter)/2;
                 angle_swing = holder_key_angle_offset * 1.25;
@@ -231,23 +232,22 @@ module filament_clip() {
         // Tip
         hull() {
             translate([0, 0, clip_z - .5 - CUT])
-                cylinder(h=.5 + 2*CUT, d=clip_tube_diameter-1, $fs=.5);
+                cylinder(h=.5 + 2*CUT, d=clip_tube_diameter-1);
             translate([0, -1, clip_z - .5 - CUT])
-                cylinder(h=.5 + 2*CUT, d=clip_tube_diameter-1, $fs=.5);
+                cylinder(h=.5 + 2*CUT, d=clip_tube_diameter-1);
         }
         // Main channel
         translate([0, 0, -99])
-            cylinder(h=clip_z - .5 + 99, d=clip_tube_diameter + slack,
-                     $fs=.5);
+            cylinder(h=clip_z - .5 + 99, d=clip_tube_diameter + slack);
         // Extra diameter at tip
         translate([0, 0, clip_z - .5 - 2])
-            cylinder(h=2, d=clip_tube_diameter + 2*slack, $fs=.5);
+            cylinder(h=2, d=clip_tube_diameter + 2*slack);
         // Extra diameter at middle
         translate([0, 0, clip_z - .5 - 5])
-            cylinder(h=2, d=clip_tube_diameter + 2*slack, $fs=.5);
+            cylinder(h=2, d=clip_tube_diameter + 2*slack);
         // Extra diameter at entrance
         translate([0, 0, clip_z - .5 - 6 - 99])
-            cylinder(h=99, d=clip_tube_diameter + 2*slack, $fs=.5);
+            cylinder(h=99, d=clip_tube_diameter + 2*slack);
     }
     module filament_cutout() {
         translate([0, holder_offset, 0])
@@ -279,9 +279,9 @@ module filament_clip() {
     }
     // Add protrusions to lock into base
     translate([side_extra, clip_height/2, 3+holder_arm_height+1])
-        sphere(d=2, $fs=.5);
+        sphere(d=2);
     translate([total_width-side_extra, clip_height/2, 3+holder_arm_height+1])
-        sphere(d=2, $fs=.5);
+        sphere(d=2);
     // Add filament holder
     translate([total_width/2, 0, 0])
         difference() {
