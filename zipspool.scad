@@ -4,7 +4,7 @@
 //
 // This file may be distributed under the terms of the GNU GPLv3 license.
 
-holder_height = 155;
+holder_height = 180;
 holder_width = 125;
 holder_arm_depth = 10;
 holder_arm_height = 5;
