@@ -126,9 +126,24 @@ module spindle() {
     enclosed_len = holder_bevel_depth+holder_arm_depth - holder_spindle_offset;
     total_height=spindle_spool_length + 2*enclosed_len;
     cyl_sides = 100;
+    module core_spindle(dia) {
+        cylinder(h=total_height, d=dia, $fn=cyl_sides);
+        bearing_bump = 2;
+        step = 15;
+        total = 2*360;
+        step_height = spindle_spool_length / total;
+        for (i=[0:step:total - step]) {
+            bb = bearing_bump * (1 - cos(i));
+            bb_next = bearing_bump * (1 - cos(i+step));
+            translate([0, 0, enclosed_len + i * step_height])
+                cylinder(h=step_height*step+CUT, d1=dia+bb, d2=dia+bb_next,
+                         $fn=cyl_sides);
+        }
+    }
     difference() {
         // Main spindle
-        cylinder(h=total_height, d=spindle_diameter, $fn=cyl_sides);
+        core_spindle(spindle_diameter);
+        core_spindle(spindle_diameter - 2*spindle_thickness);
         translate([0, 0, -CUT])
             cylinder(h=total_height + 2*CUT,
                      d=spindle_diameter - 2*spindle_thickness);
