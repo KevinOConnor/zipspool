@@ -111,52 +111,39 @@ module holder() {
 //
 
 module spindle() {
-    module pie(angle1, angle2, radius, height) {
-        translate([0, 0, -height/2])
-            intersection() {
-                rotate(a=angle1, v=[0, 0, 1])
-                       cube([radius, radius, height]);
-                rotate(a=angle1+angle2-90, v=[0, 0, 1])
-                       cube([radius, radius, height]);
-            }
-    }
-    module key_channels(edge_height, chan_height) {
-        // horizontal channels
+    module key_channels(chan_height) {
+        // Horizontal channels
         translate([0, 0, chan_height]) {
-            intersection() {
-                rotate_extrude() {
-                    translate([spindle_diameter/2, 0, 0])
-                        circle(d=spindle_key_diameter);
-                }
-                len = (spindle_diameter + spindle_key_diameter)/2;
-                angle_swing = holder_key_angle_offset * 1.25;
-                union() {
-                    for (angle=spindle_key_angles) {
-                        pie(angle-angle_swing, angle_swing*2,
-                            len, spindle_key_diameter);
-                    }
-                }
-            }
-        }
-        // vertical channels
-        for (angle=spindle_key_angles) {
-            hull() {
-                translate([0, 0, edge_height])
-                    key(angle, spindle_diameter);
-                translate([0, 0, chan_height])
-                    key(angle, spindle_diameter);
+            angle_swing = holder_key_angle_offset * 2.5;
+            for (angle=spindle_key_angles) {
+                rotate(a=angle - angle_swing/2, v=[0, 0, 1])
+                    rotate_extrude(angle=angle_swing)
+                        translate([spindle_diameter/2, 0, 0])
+                            circle(d=spindle_key_diameter);
             }
         }
     }
     enclosed_len = holder_bevel_depth+holder_arm_depth - holder_spindle_offset;
     total_height=spindle_spool_length + 2*enclosed_len;
+    cyl_sides = 100;
     difference() {
-        cylinder(h=total_height, d=spindle_diameter, $fn=100);
+        // Main spindle
+        cylinder(h=total_height, d=spindle_diameter, $fn=cyl_sides);
         translate([0, 0, -CUT])
             cylinder(h=total_height + 2*CUT,
                      d=spindle_diameter - 2*spindle_thickness);
-        key_channels(0, spindle_key_offset);
-        key_channels(total_height, total_height-spindle_key_offset);
+        // Horizontal channels
+        spindle_key2_offset = total_height - spindle_key_offset;
+        key_channels(spindle_key_offset);
+        key_channels(spindle_key2_offset);
+        // Vertical channels
+        for (angle=spindle_key_angles)
+            rotate(angle, [0, 0, 1]) {
+                translate([spindle_diameter/2, 0, -CUT])
+                    cylinder(h=spindle_key_offset+CUT, d=spindle_key_diameter);
+                translate([spindle_diameter/2, 0, spindle_key2_offset])
+                    cylinder(h=spindle_key_offset+CUT, d=spindle_key_diameter);
+            }
     }
 }
 
