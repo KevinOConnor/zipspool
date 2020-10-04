@@ -149,9 +149,7 @@ module spindle() {
         }
     }
     enclosed_len = holder_bevel_depth+holder_arm_depth - holder_spindle_offset;
-    echo(enclosed_len);
     total_height=spindle_spool_length + 2*enclosed_len;
-    echo(total_height);
     difference() {
         cylinder(h=total_height, d=spindle_diameter, $fn=100);
         translate([0, 0, -CUT])
