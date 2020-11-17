@@ -1,17 +1,16 @@
 In order to use this spool holder you will need:
 
-1. A ziplock bag. Regular 2Kg spools will fit in "2 gallon bags" that
-   can be widely found in grocery stores. However, standard ziplock
-   bags are too thin to do a good job of keeping out humidity. If
-   keeping filament dry is important to you, then purchase a 6mil
-   ziplock bag online. A regular 2Kg spool will fit in a 12x15" 6mil
-   bag.
+1. A ziplock bag. Regular 1Kg spools will fit in "2 gallon bags"
+   (13x15inch / 33x38.1cm) that can be widely found in grocery stores.
+   It's also possible to purchase thicker ziplock bags online, which
+   do a better job at keeping out humididty. A regular 1Kg spool will
+   fit in a 12x15inch (30.5x38.1cm) 6mil bag.
 
 2. PTFE tubing (with inside diameter of 2mm and outside diameter of
    4mm). Use enough tubing to go from the spool holder to the extruder
    motor.
 
-3. Desiccant (optional). A few packets of desiccant will keep the
+3. Desiccant (optional). A few packets of desiccant will help keep the
    filament dry. Look online to purchase desiccant packets that change
    color when they are saturated and that can be microwaved to reuse.
 
