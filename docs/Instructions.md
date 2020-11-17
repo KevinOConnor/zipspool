@@ -7,8 +7,9 @@ In order to use this spool holder you will need:
    fit in a 12x15inch (30.5x38.1cm) 6mil bag.
 
 2. PTFE tubing (with inside diameter of 2mm and outside diameter of
-   4mm). Use enough tubing to go from the spool holder to the extruder
-   motor.
+   4mm). At least 20cm (8 inches) of tubing is needed. It is
+   recommended to have enough tubing to go from the spool holder to
+   the extruder motor.
 
 3. Desiccant (optional). A few packets of desiccant will help keep the
    filament dry. Look online to purchase desiccant packets that change
@@ -16,9 +17,10 @@ In order to use this spool holder you will need:
 
 4. The printed parts from the [stl directory](../stl/). You will need
    two copies of the holder file (print the same holder object twice),
-   one spindle, and one clip. If you are using a large filament spool
-   (such as a "5lb spool") then use the holder-tall, spindle-wide, and
-   clip-wide files.
+   one spindle, and one clip. If you have a small print bed that does
+   not fit the default holder then you may print the holder-short file
+   instead. If you are using a large filament spool (such as a "5lb
+   spool") then use the holder, spindle-wide, and clip-wide files.
 
 ### Assembling the printed parts
 
@@ -41,10 +43,13 @@ locked into place.
 
 ![align-60](img/align-60.jpg)
 
-Attach the clip to the two holders - it should click into place. Then
-push the ptfe tubing into the clip. The tubing should fit snugly and
-pass far enough into the clip to be seen from the other side (but the
-tubing should not go past the clip).
+Cut two lengths of ptfe tubing each approximately 10cm (4 inches)
+long. After cutting the tubing inspect the opening on the tubing to
+ensure it is still round. If the opening is not round, use a small
+pliers to push the tubing back into a round shape.
+
+Push each piece of ptfe tubing into each side of the clip. Attach the
+clip to the two holders - it should click into place.
 
 ![assembled](img/assembled.jpg)
 
@@ -59,19 +64,17 @@ will be pulled under the filament spool on its way to the printer.
 Use a pair of scissors to cut 1mm from one bottom corner of a ziplock
 bag. The hole should be just large enough for the filament to pass
 through it. While the spool and spool holder are outside of the bag,
-carefully pass the filament through the clip, through the inside of
-the bag, through the hole in the corner of the bag, and then through
-the ptfe tubing.
+carefully pass the filament through the ptfe tubing and clip, through
+the inside of the bag, and then through the hole in the corner of the
+bag.
 
 ![assembled](img/thread.jpg)
 
 Then place the filament spool into the bag such that it is standing
-within the bag (the seal should be at the top). Carefully push the
-ptfe tubing into the clip until it is secure (as the ptfe tubing is
-pushed towards the clip it should also pull the ziplock bag into the
-clip).
+within the bag (the seal should be at the top).
 
-Add desiccant to the bag and then seal it. Finally, feed the filament
-from the ptfe tube to the printer's extruder motor.
+Add desiccant to the bag and then seal it. An additional length of
+ptfe tubing can be used to go from the ptfe tubing on the clip all the
+way to the printer's extruder motor.
 
 ![filament-in-bag](img/filament-in-bag.jpg)
