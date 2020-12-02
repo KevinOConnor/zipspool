@@ -6,10 +6,11 @@ In order to use this spool holder you will need:
    do a better job at keeping out humidity. A regular 1Kg spool will
    fit in a 12x15inch (30.5x38.1cm) 6mil bag.
 
-2. PTFE tubing (with inside diameter of 2mm and outside diameter of
-   4mm). At least 20cm (8 inches) of tubing is needed. It is
-   recommended to have enough tubing to go from the spool holder to
-   the extruder motor.
+2. PTFE tubing (4mm outside diameter). At least 20cm (8 inches) of
+   tubing is needed. It is recommended to have enough tubing to go
+   from the spool holder to the extruder motor. It is recommended to
+   use tubing with an inside diameter of 3mm (an inside diameter of
+   2mm also works but has higher friction).
 
 3. Desiccant (optional). A few packets of desiccant will help keep the
    filament dry. Look online to purchase desiccant packets that change
