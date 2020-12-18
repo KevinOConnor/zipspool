@@ -23,8 +23,8 @@ spindle_key_offset = 5;
 spindle_key_angles = [90, 210, 330];
 spindle_spool_length = 71;
 ptfe_tube_diameter = 4;
-clip_height = 10;
-clip_depth = 10;
+clip_beam_width = 10;
+clip_beam_height = 5;
 slack = 1;
 CUT = 0.01;
 $fs = 0.5;
@@ -163,135 +163,150 @@ module spindle() {
 }
 
 //
-// Clip on filament guide
+// Holder clip and filament carriage platform
 //
 
-module filament_clip() {
-    module round_off(radius, degrees, shift) {
-        translate(shift) {
-            rotate([0, degrees, 0]) {
-                translate([-CUT, -CUT, -CUT]) {
-                    difference() {
-                        cube([radius+CUT, clip_height + 2*CUT, radius+CUT]);
-                        translate([radius, 0, radius])
-                            rotate([-90, 0, 0])
-                                cylinder(h=clip_height+2*CUT, r=radius, $fn=10);
-                    }
-                }
-            }
-        }
-    }
-
-    clip_width = holder_arm_depth + slack/2;
-    module inverse_arm(xpos, zpos, transform) {
-        module arm() {
-            cube([clip_width, clip_depth + 2*CUT, holder_arm_height + slack/2]);
-        }
-        module clip() {
-            translate([0, (clip_depth-holder_clip_height-slack)/2,
-                       CUT-holder_clip_width])
-                cube([clip_width, holder_clip_height+slack,
-                      holder_clip_width+CUT]);
-        }
-        translate([xpos, -CUT, zpos]) {
-            hull() {
-                arm();
-                translate(transform)
-                    arm();
-            }
-            clip();
-        }
-    }
+module base_clip() {
     clip_z = 10;
-    tube_z = 24;
-    clip_inner_height = 5;
-    outer_diameter = ptfe_tube_diameter+5;
+    clip_width = holder_arm_depth + slack/2;
+    side_extra = 3;
+    clip_total_width = clip_width+side_extra+5;
+    base_width = spindle_spool_length+2*(holder_bevel_depth + holder_arm_depth);
+    total_width = base_width + 2*side_extra;
     holder_angle = 30;
-    holder_offset = 5;
-    guide_lift = -1;
-    module filament_holder() {
-        module base(y, z) {
-            adj_y = y + clip_inner_height/2;
-            translate([-outer_diameter, outer_diameter/2 - adj_y, 0])
-                cube([2*outer_diameter, y, z]);
+    angle_z_offset = 1.5;
+    angle_y_offset = 1.5;
+    module rounded_cube(x, y, z) {
+        edge_radius = 2;
+        hull() {
+            translate([edge_radius, edge_radius, 0])
+                cylinder(h=z, r=edge_radius);
+            translate([edge_radius, y-edge_radius, 0])
+                cylinder(h=z, r=edge_radius);
+            translate([x-edge_radius, edge_radius, 0])
+                cylinder(h=z, r=edge_radius);
+            translate([x-edge_radius, y-edge_radius, 0])
+                cylinder(h=z, r=edge_radius);
         }
-        module outer_cylinder() {
-            hull() {
-                rotate(-holder_angle, v=[1, 0, 0])
-                    base(1, clip_z);
-                translate([0, guide_lift, 0])
-                    cylinder(h=tube_z, d=outer_diameter);
-            }
+    }
+    module inverse_arm() {
+        z = (clip_z-holder_clip_height-slack)/2 - angle_z_offset;
+        inset = 1;
+        module arm() {
+            translate([side_extra, holder_clip_width+inset, -19])
+                cube([clip_width, 19, z+2*19]);
+            translate([side_extra, inset, z])
+                cube([clip_width, holder_clip_width+CUT,
+                      holder_clip_height+slack]);
         }
-        translate([0, holder_offset, 0]) {
-            intersection() {
-                base(99, 99);
-                rotate(holder_angle, v=[1, 0, 0])
-                    outer_cylinder();
+        difference() {
+            arm();
+            notch_dia = 2;
+            notch_y = (holder_arm_height + slack + notch_dia/2
+                       + holder_clip_width+inset);
+            translate([side_extra, notch_y, z + notch_dia/2 + .5])
+                sphere(d=notch_dia);
+            second_z = z + holder_clip_height+slack - notch_dia/2 - .5;
+            translate([side_extra, notch_y, second_z])
+                sphere(d=notch_dia);
+        }
+    }
+    module grips_and_beam() {
+        rounded_cube(total_width, clip_beam_width, clip_beam_height);
+        clip_y = clip_beam_width + slack;
+        module grip()
+            rounded_cube(clip_total_width, clip_y, clip_z - angle_z_offset);
+        translate([0, angle_y_offset, 0])
+            rotate([holder_angle, 0, 0]) {
+                grip();
+                translate([total_width, 0, 0])
+                    mirror([1, 0, 0])
+                        grip();
             }
+    }
+    module main_platform() {
+        difference() {
+            grips_and_beam();
+            translate([0, angle_y_offset, 0])
+                rotate([holder_angle, 0, 0]) {
+                    inverse_arm();
+                    translate([total_width, 0, 0])
+                        mirror([1, 0, 0])
+                            inverse_arm();
+                }
+        }
+    }
+    intersection() {
+        main_platform();
+        translate([0, -19, 0])
+            rounded_cube(total_width, clip_beam_width+19, 19);
+    }
+}
+
+//
+// Filament tube carriage
+//
+
+module carriage() {
+    side_thick = 3;
+    guide_rad = 1;
+    barrier_thick = 1;
+    insert_thick = 11;
+    carriage_space_x = clip_beam_width + slack + 2*guide_rad;
+    total_x = carriage_space_x + 2*side_thick + barrier_thick + insert_thick;
+    outer_dia = ptfe_tube_diameter + 5;
+    carriage_space_y = clip_beam_height + slack + guide_rad;
+    tube_center_y = side_thick + carriage_space_y + ptfe_tube_diameter/2;
+    tube_center_z = outer_dia / 2;
+    total_y = tube_center_y + outer_dia/2;
+
+    module base() {
+        hull() {
+            cube([carriage_space_x + 2*side_thick, tube_center_y, outer_dia]);
+            translate([0, tube_center_y, tube_center_z])
+                rotate([0, 90, 0])
+                    cylinder(h=total_x, d=outer_dia);
         }
     }
     module filament_tube() {
-        module tube(d, z1, z2) {
-            translate([0, 0, z1])
-                cylinder(h=(z2-z1), d=d);
-        }
-        filament_only_dia = ptfe_tube_diameter - 1;
-        tube_guide_dia = ptfe_tube_diameter + slack / 4;
-        tube_extra_dia = ptfe_tube_diameter + slack;
-        separator_z1 = tube_z / 2 + 1 - .5;
-        separator_z2 = separator_z1 + 1;
+        filament_only_dia = ptfe_tube_diameter - .75;
+        tube_guide_dia = ptfe_tube_diameter + slack / 2;
         // Main channel
-        tube(filament_only_dia, 0, tube_z);
-        tube(tube_guide_dia, -99, separator_z1);
-        tube(tube_guide_dia, separator_z2, 99);
-        // Add ribs to channel
-        tube(tube_extra_dia, -99, separator_z1 - 8);
-        tube(tube_extra_dia, separator_z1 - 7, separator_z1 - 4);
-        tube(tube_extra_dia, separator_z1 - 3, separator_z1);
-        tube(tube_extra_dia, separator_z2, separator_z2 + 3);
-        tube(tube_extra_dia, separator_z2 + 4, separator_z2 + 7);
-        tube(tube_extra_dia, separator_z2 + 8, 99);
+        cylinder(h=total_x + 2*CUT, d=filament_only_dia);
+        l1 = carriage_space_x + 2*side_thick + 2 + CUT;
+        cylinder(h=l1, d=tube_guide_dia);
+        translate([0, 0, l1 + barrier_thick])
+            cylinder(h=insert_thick+CUT, d=tube_guide_dia);
     }
-    module filament_cutout() {
-        translate([0, holder_offset, 0])
-            rotate(holder_angle, v=[1, 0, 0])
-                translate([0, guide_lift, 0])
-                    filament_tube();
-    }
-    // Basic clip
-    base_width = spindle_spool_length+2*(holder_bevel_depth + holder_arm_depth);
-    side_extra = 3;
-    total_width = base_width + 2*side_extra;
-    clip_total_width = clip_width+side_extra+5;
+
     difference() {
-        cube([total_width, clip_height, clip_z]);
-        round_off(2, 0, [0, 0, 0]);
-        round_off(2, 90, [0, 0, clip_z]);
-        round_off(2, 270, [total_width, 0, 0]);
-        round_off(2, 180, [total_width, 0, clip_z]);
-        inverse_arm(side_extra, 3, [0, 0, 10]);
-        inverse_arm(base_width+side_extra-clip_width, 3, [0, 0, 10]);
-        translate([clip_total_width, clip_height-clip_inner_height/2, -CUT])
-            cube([total_width - 2*clip_total_width,
-                  (clip_height-clip_inner_height)/2+CUT, clip_z+2*CUT]);
-        translate([clip_total_width, -CUT, -CUT])
-            cube([total_width - 2*clip_total_width,
-                  (clip_height-clip_inner_height)/2+CUT, clip_z+2*CUT]);
-        translate([total_width/2, 0, 0])
-            filament_cutout();
+        base();
+        // cutout for carriage
+        translate([side_thick, side_thick, -CUT])
+            cube([carriage_space_x, total_y, outer_dia+2*CUT]);
+        // cutout for tube
+        translate([-CUT, tube_center_y, tube_center_z])
+            rotate([0, 90, 0])
+                filament_tube();
     }
-    // Add protrusions to lock into base
-    translate([side_extra, clip_height/2, 3+holder_arm_height+1])
-        sphere(d=2);
-    translate([total_width-side_extra, clip_height/2, 3+holder_arm_height+1])
-        sphere(d=2);
-    // Add filament holder
-    translate([total_width/2, 0, 0])
-        difference() {
-            filament_holder();
-            filament_cutout();
-        }
+    // Add in guide protrusions
+    p_x1 = side_thick;
+    p_x2 = side_thick + carriage_space_x;
+    p_x3 = side_thick + 3;
+    p_x4 = side_thick + carriage_space_x - 3;
+    p_y1 = side_thick + clip_beam_height/2 + guide_rad;
+    p_y2 = side_thick;
+    p_z1 = 2;
+    p_z2 = outer_dia - 2;
+    protrusions = [
+        [p_x1, p_y1, p_z1], [p_x2, p_y1, p_z1],
+        [p_x1, p_y1, p_z2], [p_x2, p_y1, p_z2],
+        [p_x3, p_y2, p_z1], [p_x4, p_y2, p_z1],
+        [p_x3, p_y2, p_z2], [p_x4, p_y2, p_z2],
+    ];
+    for (pos=protrusions)
+        translate(pos)
+            sphere(r=guide_rad);
 }
 
 //
@@ -300,4 +315,5 @@ module filament_clip() {
 
 holder();
 //spindle();
-//filament_clip();
+//base_clip();
+//carriage();
