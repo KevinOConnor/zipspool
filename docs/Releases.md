@@ -1,5 +1,13 @@
 History of Zipspool releases.
 
+Zipspool v2.1.0
+===============
+
+Available on 20210120:
+* Update clip so that the tube can move sideways on a carriage.  This
+  helps encourage the filament to pull directly from the spool, which
+  can reduce the chance of crimping and reduce overall friction.
+
 Zipspool v2.0.0
 ===============
 
