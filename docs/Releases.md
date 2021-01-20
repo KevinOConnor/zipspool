@@ -4,9 +4,11 @@ Zipspool v2.1.0
 ===============
 
 Available on 20210120:
-* Update clip so that the tube can move sideways on a carriage.  This
-  helps encourage the filament to pull directly from the spool, which
-  can reduce the chance of crimping and reduce overall friction.
+* Update clip so that the tube fits into a carriage which can move
+  sideways along the clip.  This encourages the filament to pull
+  straight from the spool instead of at an angle.  This reduces
+  friction as the spool turns and can reduce the chance of the
+  filament crimping as it passes through the tube.
 
 Zipspool v2.0.0
 ===============
